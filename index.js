@@ -3,14 +3,50 @@ const path = require('path');
 
 const app = express();
 
+app.use(express.json())
+
+const apiUrl = "https://karaoke-rides-singh-charges.trycloudflare.com/api/generate";
+
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-
-// Serve index.html for all routes
-app.get('*', (req, res,) => {
+app.get('/', (req, res,) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.post('/api/generate', async (req, res) => {
+    const requestBody = req.body;
+
+    // make post request to the API
+    const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+    });
+
+    // check if response is valid
+    if (!response.body) {
+        throw new Error('Response body not available');
+    }
+
+    const reader = response.body.getReader();
+
+    while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+            res.end();
+            break;
+        }
+
+        res.write(new TextDecoder().decode(value));
+    }
+
+    
+
 });
 
 // Start the server
