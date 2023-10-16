@@ -38,12 +38,13 @@ app.post('/api/generate', async (req, res) => {
         const { done, value } = await reader.read();
 
         if (done) {
-            res.end();
             break;
         }
 
         res.write(new TextDecoder().decode(value));
     }
+
+    res.end();
 
     
 
