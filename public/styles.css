@@ -1,0 +1,228 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    /* background-color: #343541; */
+    background-color:  #343541;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+
+.header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    background-color: #343541;
+}
+
+.logo {
+    padding: 1rem;
+    max-width: 15rem;
+    background-color: transparent;
+}
+
+.chat-area {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    background-color: #343541;
+    overflow: auto;
+}
+
+.chat-area::-webkit-scrollbar {
+    display: none;
+}
+
+.user-response {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    color: #ececf1;
+    border-top: 1px solid #222222;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.ai-response {
+    background-color: #444654;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    color: #d1d5db;
+    border-top: 1px solid #222222;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.text-data {
+    display: flex;
+    flex-direction: column;
+    background-color: transparent;
+    gap: 1.5rem;
+    max-width: 48rem;
+    width: 100%;
+}
+
+.text-data p {
+    padding-left: 1rem;
+    padding-right: 1.5rem;
+}
+
+.text-data img {
+    padding-left: 1rem;
+    padding-right: 1.5rem;
+    padding-top: 1rem;
+}
+
+@media screen and (max-width: 768px) {
+    .text-data {
+        max-width: calc(100% - 2rem);
+    }
+    
+}
+
+.avatar {
+    border-radius: 0.25rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-top: 0.3rem;
+    margin-left: 1rem;
+}
+
+@media screen and (max-width: 768px) {
+    .avatar {
+        margin-left: 1rem;
+    }
+}
+    
+
+
+.input-area {
+    background: linear-gradient(180deg,rgba(53,55,64,0),#343541 58.85%);
+    /* background-color: #40414F; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: 0;
+    padding-top: 2.5rem;
+    width: 100%;
+
+}
+
+.input-area footer {
+    font-size: smaller;
+    margin-top: 0.5rem;
+    color: #cacaca;
+    background-color: transparent;
+}
+
+
+.input-field {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    margin-top: 10px;
+    background-color: #40414F;
+    border-radius: 1rem;
+    width: 47.5rem;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.125);
+}
+
+@media  (max-width: 768px) {
+    .input-field {
+        width: calc(100% - 2rem);
+    }  
+}
+
+input[type="text"] {
+    background-color: #40414F;
+    color: white;
+    width: 100%;
+    max-width: 100%;
+    padding: 20px;
+    border: none;
+    border-radius: 1rem;
+    text-wrap: wrap;
+    font-size: 1rem;
+}
+
+textarea:focus, input:focus{
+    outline: none;
+}
+
+.submit-button {
+    display: flex;
+    background-color: transparent;
+    color: white;
+    padding: 0.35rem;
+    border-radius: 0.375rem;
+    border: none;
+    align-items: center; 
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;  
+    margin-left: 0.25rem;
+    margin-right: 0.5rem;
+    transition: background-color 0.25s ease;
+}
+
+i {
+    background-color: transparent;
+    font-size: large;
+    color: #7c7c7c;
+    margin: 0.25rem 0.35rem;
+    transition: color 0.25s ease;
+}
+
+.chat-clear {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.toast {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem;
+    margin-top: 2rem;
+    border-radius: 1rem;
+    background-color: #ff4d4d;
+    color: white;
+    font-weight: bold;
+    z-index: 9999;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.125);
+    animation: slide-down 0.25s ease-out;
+}
+
+.toast.hide {
+    animation: slide-up 0.25s ease-out;
+}
+
+@keyframes slide-down {
+    0% {
+        transform: translate(-50%, -100%);
+    }
+    100% {
+        transform: translate(-50%, 0);
+    }
+}
+
+@keyframes slide-up {
+    0% {
+        transform: translate(-50%, 0);
+    }
+    100% {
+        transform: translate(-50%, -200%);
+    }
+}
+
+
