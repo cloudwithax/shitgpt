@@ -35,6 +35,9 @@ clearButton.addEventListener('click', async () => {
             chatIsClear = true;
             await sleep(1);
             inputArea.style.position = 'absolute';
+            newestMessage = '';
+            aiChatMessage = null;
+            conversationContext = null;
         }
     } else {
         let toast = document.querySelector('.toast');
