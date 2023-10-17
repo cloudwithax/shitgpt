@@ -5,7 +5,7 @@ const app = express();
 
 app.use(express.json())
 
-const apiUrl = "https://karaoke-rides-singh-charges.trycloudflare.com/api/generate";
+const apiUrl = "https://api.clxud.dev/api/generate";
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -45,10 +45,8 @@ app.post('/api/generate', async (req, res) => {
     }
 
     res.end();
-
-    
-
 });
+
 
 // Start the server
 const port = process.env.PORT || 3000;

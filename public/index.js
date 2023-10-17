@@ -1,5 +1,5 @@
 // Replace this with your actual API endpoint
-const apiUrl = `${window.location.href}api/generate`;
+const apiUrl = `https://shitgpt.clxud.dev/api/generate`;
 
 const chatArea = document.querySelector('.chat-area');
 const inputArea = document.querySelector('.input-area');
@@ -175,14 +175,14 @@ async function executeApiRequest() {
 
     if (conversationContext) {
         requestBody = JSON.stringify({
-            model: "mistral",
+            model: "zephyr",
             prompt: prompt,
             context: conversationContext,
             stream: "false"
         });
     } else {
         requestBody = JSON.stringify({
-            model: "mistral",
+            model: "zephyr",
             prompt: prompt,
             stream: "false"
         });
