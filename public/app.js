@@ -105,16 +105,32 @@ async function sleep(ms) {
 
 async function displayAiMessage(text) {
     newestMessage += text;
+
+    const idName = 'typewriter' + Math.floor(Math.random() * 1000000);
     
     if (!aiChatMessage) {
         const aiResponse = document.createElement('div');
         aiResponse.classList.add('ai-response');
-        aiResponse.innerHTML = `<img src="ai-icon.png" alt="ai icon" class="avatar"><div class="text-data">${marked.parse(newestMessage)}</div>`;
+        aiResponse.innerHTML = `<img src="ai-icon.png" alt="ai icon" class="avatar"><div class="text-data"><p id="${idName}"></p></div>`;
         chatArea.appendChild(aiResponse);
         aiChatMessage = aiResponse;
     } else {
-        aiChatMessage.innerHTML = `<img src="ai-icon.png" alt="ai icon" class="avatar"><div class="text-data">${marked.parse(newestMessage)}</div>`;
+        aiChatMessage.innerHTML = `<img src="ai-icon.png" alt="ai icon" class="avatar"><div class="text-data"><p id="${idName}"></p></div>`;
     }
+
+    new TypeIt(`#${idName}`, {
+        strings: newestMessage,
+        speed: 10,
+        loop: false,
+        cursorSpeed: 9007199254740991,
+        cursor: {
+            autoPause: true,
+            options: {
+                hideWhenDone: true
+            }
+        }   
+      }).go();
+
 
     window.scrollTo(0, document.body.scrollHeight);
 }
@@ -159,11 +175,13 @@ async function executeApiRequest() {
             model: "mistral",
             prompt: prompt,
             context: conversationContext,
+            stream: "false"
         });
     } else {
         requestBody = JSON.stringify({
             model: "mistral",
             prompt: prompt,
+            stream: "false"
         });
     }
 
@@ -183,6 +201,8 @@ async function executeApiRequest() {
         const reader = response.body.getReader();
         let responseText = '';
 
+        let textResponse = '';
+
         while (true) {
             const { done, value } = await reader.read();
 
@@ -199,11 +219,11 @@ async function executeApiRequest() {
 
                 try {
                     const messageData = JSON.parse(message);
+                    if (messageData.response) {
+                        textResponse += messageData.response;
+                    }
                     if (messageData.context) {
                         conversationContext = messageData.context;
-                    }
-                    if (messageData.response) {
-                        await displayAiMessage(messageData.response);
                     }
                 } catch (error) {
                     console.error('Error parsing message:', error);
@@ -211,6 +231,7 @@ async function executeApiRequest() {
             }
         }
 
+        await displayAiMessage(textResponse);
         
         newestMessage = '';
         aiChatMessage = null;
