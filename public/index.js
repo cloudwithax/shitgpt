@@ -1,5 +1,5 @@
 // Replace this with your actual API endpoint
-const apiUrl = `https://api.clxud.dev/api/generate`;
+const apiUrl = `${window.location.href}/api/generate`;
 
 const chatArea = document.querySelector('.chat-area');
 const inputArea = document.querySelector('.input-area');
