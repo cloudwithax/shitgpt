@@ -1,5 +1,5 @@
 // Replace this with your actual API endpoint
-const apiUrl = `https://shitgpt.clxud.dev/api/generate`;
+const apiUrl = `https://api.clxud.dev/api/generate`;
 
 const chatArea = document.querySelector('.chat-area');
 const inputArea = document.querySelector('.input-area');
@@ -13,19 +13,8 @@ let chatIsClear = true;
 let aiChatMessage;
 let conversationContext;
 
-// Add an event listener to the chat area to check if the user can scroll
-chatArea.addEventListener('DOMNodeInserted', () => {
-    // Check if the user can scroll
-    const canScroll = chatArea.scrollHeight - chatArea.scrollTop === chatArea.clientHeight;
+let isAiThinking = false;
 
-    // If the user can't scroll, add a temporary margin
-    if (!canScroll) {
-        chatArea.style.marginTop = '2rem';
-    } else {
-        // If the user can scroll, remove the margin
-        chatArea.style.marginBottom = '0';
-    }
-});
 
 clearButton.addEventListener('click', async () => {
     if (!chatIsClear) {
@@ -69,7 +58,14 @@ promptInput.addEventListener('keydown', (event) => {
 
 // on scroll
 document.addEventListener('scroll', () => {
-    inputArea.style.position = 'sticky';
+    const inputAreaRect = inputArea.getBoundingClientRect();
+    const chatAreaRect = chatArea.getBoundingClientRect();
+    const chatAreaBottom = chatAreaRect.top + chatAreaRect.height;
+    const inputAreaTop = inputAreaRect.top;
+    if (chatAreaBottom >= inputAreaTop) {
+        inputArea.style.position = 'sticky';
+    }
+    
 });
 
 promptInput.addEventListener('input', () => {
@@ -92,6 +88,14 @@ promptInput.addEventListener('input', () => {
 });
 
 
+function enableInput() {
+    newestMessage = '';
+    aiChatMessage = null;
+    promptInput.disabled = false;
+    promptInput.focus();
+    chatArea.scrollTop = chatArea.scrollHeight;
+}
+
 async function displayUserMessage(text) {
     const userResponse = document.createElement('div');
     userResponse.classList.add('user-response');
@@ -107,6 +111,7 @@ async function sleep(ms) {
 }
 
 async function displayAiMessage(text) {
+    isAiThinking = false;
     newestMessage += text;
 
     const idName = 'typewriter' + Math.floor(Math.random() * 1000000);
@@ -122,8 +127,14 @@ async function displayAiMessage(text) {
     }
 
     new TypeIt(`#${idName}`, {
+        afterStep: async () => {
+            window.scrollTo(0, document.body.scrollHeight);
+        },
+        afterComplete: async () => {
+            enableInput();
+        },
         strings: newestMessage,
-        speed: 10,
+        speed: 5,
         loop: false,
         cursorSpeed: 9007199254740991,
         cursor: {
@@ -135,7 +146,7 @@ async function displayAiMessage(text) {
       }).go();
 
 
-    window.scrollTo(0, document.body.scrollHeight);
+    
 }
 
 async function displayAiThinking() {
@@ -145,6 +156,14 @@ async function displayAiThinking() {
     aiChatMessage = aiResponse;
     aiChatMessage.innerHTML = `<img src="ai-icon.png" alt="ai icon" class="avatar"><div class="text-data"><img src="loading.gif" style="max-width: 1rem;" alt="loading"></div>`;
     window.scrollTo(0, document.body.scrollHeight);
+    isAiThinking = true;
+
+    setTimeout(() => {
+        if (isAiThinking) {
+            // edit the message
+            aiChatMessage.innerHTML = `<img src="ai-icon.png" alt="ai icon" class="avatar"><div class="text-data"><img src="loading.gif" style="max-width: 1rem;" alt="loading"><div class="dono-msg">Don't like waiting? <a href="https://www.buymeacoffee.com/cloudwithax" target="_blank">Buy me a coffee</a> to help me get better hardware :)</div></div>`;
+        }
+    }, 5000);
 }
 
 
@@ -235,12 +254,6 @@ async function executeApiRequest() {
         }
 
         await displayAiMessage(textResponse);
-        
-        newestMessage = '';
-        aiChatMessage = null;
-        promptInput.disabled = false;
-        promptInput.focus();
-        chatArea.scrollTop = chatArea.scrollHeight;
     } catch (error) {
         console.error('API request failed:', error);
     }
