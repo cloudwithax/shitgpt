@@ -5,6 +5,8 @@ const app = express();
 
 app.use(express.json())
 
+require('dotenv').config();
+
 const apiUrl = "https://api.clxud.dev/api/generate";
 
 // Serve static files from the public directory
@@ -49,7 +51,7 @@ app.post('/api/generate', async (req, res) => {
 
 
 // Start the server
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });
