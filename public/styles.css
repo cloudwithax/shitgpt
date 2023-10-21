@@ -1,10 +1,35 @@
+html,
 body {
     font-family: Arial, Helvetica, sans-serif;
     /* background-color: #343541; */
-    background-color:  #343541;
+    background-color: #343541;
+    height: 100%;
+    margin: 0;
+}
+
+::-webkit-scrollbar {
+    width: 0.5rem;
+    height: 0.5rem;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 0.25rem;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 0.25rem;
+    background: #ccc;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+
+.main {
     display: flex;
     flex-direction: column;
-    margin: 0;
+    min-height: 100%;
 }
 
 
@@ -85,7 +110,7 @@ body {
     .text-data {
         max-width: calc(100% - 2rem);
     }
-    
+
 }
 
 .avatar {
@@ -101,17 +126,17 @@ body {
         margin-left: 1rem;
     }
 }
-    
+
 
 
 .input-area {
-    background: linear-gradient(180deg,rgba(53,55,64,0),#343541 58.85%);
+    background: linear-gradient(180deg, rgba(53, 55, 64, 0), #343541 58.85%);
     /* background-color: #40414F; */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    position: absolute;
+    position: sticky;
     bottom: 0;
     padding-top: 2.5rem;
     width: 100%;
@@ -138,10 +163,10 @@ body {
     box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.125);
 }
 
-@media  (max-width: 768px) {
+@media (max-width: 768px) {
     .input-field {
         width: calc(100% - 2rem);
-    }  
+    }
 }
 
 input[type="text"] {
@@ -156,7 +181,8 @@ input[type="text"] {
     font-size: 1rem;
 }
 
-textarea:focus, input:focus{
+textarea:focus,
+input:focus {
     outline: none;
 }
 
@@ -167,9 +193,9 @@ textarea:focus, input:focus{
     padding: 0.35rem;
     border-radius: 0.375rem;
     border: none;
-    align-items: center; 
+    align-items: center;
     margin-top: 0.5rem;
-    margin-bottom: 0.5rem;  
+    margin-bottom: 0.5rem;
     margin-left: 0.25rem;
     margin-right: 0.5rem;
     transition: background-color 0.25s ease;
@@ -223,6 +249,7 @@ i {
     0% {
         opacity: 0;
     }
+
     100% {
         opacity: 1;
     }
@@ -232,6 +259,7 @@ i {
     0% {
         transform: translate(-50%, -100%);
     }
+
     100% {
         transform: translate(-50%, 0);
     }
@@ -241,9 +269,8 @@ i {
     0% {
         transform: translate(-50%, 0);
     }
+
     100% {
         transform: translate(-50%, -200%);
     }
 }
-
-

@@ -2,10 +2,11 @@
 const apiUrl = `${window.location.href}api/generate`;
 
 const chatArea = document.querySelector('.chat-area');
-const inputArea = document.querySelector('.input-area');
+const inputArea = document.getElementById('input-area');
 const promptInput = document.getElementById('prompt');
 const submitButton = document.getElementById('submit');
 const clearButton = document.getElementById('clear');
+
 
 submitButton.addEventListener('click', executeApiRequest);
 let newestMessage = '';
@@ -14,6 +15,23 @@ let aiChatMessage;
 let conversationContext;
 
 let isAiThinking = false;
+
+let allowGenerate = true;
+
+function disableScrolling() {
+    document.body.style.overflow = 'hidden';
+}
+
+function enableScrolling() {
+    document.body.style.overflow = 'auto';
+}
+
+// disable scrolling when ai is thinking
+window.addEventListener('scroll', () => {
+    if (isAiThinking) {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+});
 
 
 clearButton.addEventListener('click', async () => {
@@ -56,17 +74,6 @@ promptInput.addEventListener('keydown', (event) => {
     
 });
 
-// on scroll
-document.addEventListener('scroll', () => {
-    const inputAreaRect = inputArea.getBoundingClientRect();
-    const chatAreaRect = chatArea.getBoundingClientRect();
-    const chatAreaBottom = chatAreaRect.top + chatAreaRect.height;
-    const inputAreaTop = inputAreaRect.top;
-    if (chatAreaBottom >= inputAreaTop) {
-        inputArea.style.position = 'sticky';
-    }
-    
-});
 
 promptInput.addEventListener('input', () => {
     if (promptInput.value == '') {
@@ -94,6 +101,11 @@ function enableInput() {
     promptInput.disabled = false;
     promptInput.focus();
     chatArea.scrollTop = chatArea.scrollHeight;
+    const sendIcon = document.getElementById('send-icon');
+    sendIcon.classList.remove('fa-stop');
+    sendIcon.classList.add('fa-paper-plane');
+    sendIcon.style.color = '#7c7c7c';
+    submitButton.style.cursor = 'default';
 }
 
 async function displayUserMessage(text) {
@@ -101,6 +113,7 @@ async function displayUserMessage(text) {
     userResponse.classList.add('user-response');
     userResponse.innerHTML = `<img src="user-icon.png" alt="user icon" class="avatar"><div class="text-data"><p>${text}</p></div>`;
     chatArea.appendChild(userResponse);
+
 
     window.scrollTo(0, document.body.scrollHeight);
     
@@ -113,39 +126,18 @@ async function sleep(ms) {
 async function displayAiMessage(text) {
     isAiThinking = false;
     newestMessage += text;
-
-    const idName = 'typewriter' + Math.floor(Math.random() * 1000000);
     
     if (!aiChatMessage) {
         const aiResponse = document.createElement('div');
         aiResponse.classList.add('ai-response');
-        aiResponse.innerHTML = `<img src="ai-icon.png" alt="ai icon" class="avatar"><div class="text-data"><p id="${idName}"></p></div>`;
+        aiResponse.innerHTML = `<img src="ai-icon.png" alt="ai icon" class="avatar"><div class="text-data"><p>${newestMessage}</p></div>`;
         chatArea.appendChild(aiResponse);
         aiChatMessage = aiResponse;
     } else {
-        aiChatMessage.innerHTML = `<img src="ai-icon.png" alt="ai icon" class="avatar"><div class="text-data"><p id="${idName}"></p></div>`;
+        aiChatMessage.innerHTML = `<img src="ai-icon.png" alt="ai icon" class="avatar"><div class="text-data"><p>${newestMessage}</p></div>`;
     }
 
-    new TypeIt(`#${idName}`, {
-        afterStep: async () => {
-            window.scrollTo(0, document.body.scrollHeight);
-        },
-        afterComplete: async () => {
-            enableInput();
-        },
-        strings: newestMessage,
-        speed: 5,
-        loop: false,
-        cursorSpeed: 9007199254740991,
-        cursor: {
-            autoPause: true,
-            options: {
-                hideWhenDone: true
-            }
-        }   
-      }).go();
-
-
+    window.scrollTo(0, document.body.scrollHeight);
     
 }
 
@@ -155,11 +147,12 @@ async function displayAiThinking() {
     chatArea.appendChild(aiResponse);
     aiChatMessage = aiResponse;
     aiChatMessage.innerHTML = `<img src="ai-icon.png" alt="ai icon" class="avatar"><div class="text-data"><img src="loading.gif" style="max-width: 1rem;" alt="loading"></div>`;
+    // if aimessage height is colliding with input area then add margin
     window.scrollTo(0, document.body.scrollHeight);
     isAiThinking = true;
 
     setTimeout(() => {
-        if (isAiThinking) {
+        if (isAiThinking || !allowGenerate) {
             // edit the message
             aiChatMessage.innerHTML = `<img src="ai-icon.png" alt="ai icon" class="avatar"><div class="text-data"><img src="loading.gif" style="max-width: 1rem;" alt="loading"><div class="dono-msg">Don't like waiting? <a href="https://www.buymeacoffee.com/cloudwithax" target="_blank">Buy me a coffee</a> to help me get better hardware :)</div></div>`;
         }
@@ -168,6 +161,14 @@ async function displayAiThinking() {
 
 
 async function executeApiRequest() {
+    if (document.getElementById('send-icon').classList.contains('fa-stop') && allowGenerate) {
+        allowGenerate = false;
+        enableInput();
+        setTimeout(() => {
+            allowGenerate = true;
+        }, 100);
+        return;
+    }
     if (promptInput.value == '') {
         return;
     }
@@ -187,6 +188,9 @@ async function executeApiRequest() {
     const sendIcon = document.getElementById('send-icon');
     sendIcon.style.color = '#7c7c7c';
 
+    
+    
+
     await displayUserMessage(prompt);
     await displayAiThinking();
 
@@ -197,15 +201,16 @@ async function executeApiRequest() {
             model: "zephyr",
             prompt: prompt,
             context: conversationContext,
-            stream: "false"
+            // stream: "false"
         });
     } else {
         requestBody = JSON.stringify({
             model: "zephyr",
             prompt: prompt,
-            stream: "false"
+            // stream: "false"
         });
     }
+
 
     try {
         const response = await fetch(apiUrl, {
@@ -220,15 +225,22 @@ async function executeApiRequest() {
             throw new Error('Response body not available');
         }
 
+
         const reader = response.body.getReader();
         let responseText = '';
 
         let textResponse = '';
 
+        sendIcon.classList.remove('fa-paper-plane');
+        sendIcon.classList.add('fa-stop');
+        sendIcon.style.color = 'white';
+        submitButton.style.cursor = 'pointer';
+        disableScrolling();
+
         while (true) {
             const { done, value } = await reader.read();
 
-            if (done) {
+            if (done || !allowGenerate) {
                 break;
             }
 
@@ -243,6 +255,7 @@ async function executeApiRequest() {
                     const messageData = JSON.parse(message);
                     if (messageData.response) {
                         textResponse += messageData.response;
+                        await displayAiMessage(messageData.response);
                     }
                     if (messageData.context) {
                         conversationContext = messageData.context;
@@ -253,7 +266,12 @@ async function executeApiRequest() {
             }
         }
 
-        await displayAiMessage(textResponse);
+        sendIcon.classList.remove('fa-paper-plane');
+        sendIcon.classList.add('fa-stop');
+        sendIcon.style.color = 'white';
+        submitButton.style.cursor = 'pointer';
+        enableInput();
+        enableScrolling();
     } catch (error) {
         console.error('API request failed:', error);
     }
