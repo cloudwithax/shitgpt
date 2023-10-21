@@ -40,8 +40,6 @@ clearButton.addEventListener('click', async () => {
         if (confirmation) {
             chatArea.innerHTML = '';
             chatIsClear = true;
-            await sleep(1);
-            inputArea.style.position = 'absolute';
             newestMessage = '';
             aiChatMessage = null;
             conversationContext = null;
